@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Welcome to room {{room_no}}</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style>
+            .form-control{
+                display: inline;
+            }
+            .inputblock {
+                margin-bottom: 5px;
+            }
+            #input1 {
+                text-align: center;
+            }
+            .msg {
+                display: inline-block;
+                margin-top: 3px;
+                border: 1px solid;
+                border-radius: 5px;
+                background-color:blueviolet;
+                color: white;
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="height: 100vh;position: relative;" class="d-flex justify-content-center align-items-center main">
+            <h1 style="position: absolute;top: 0px;">Welcome to room: {{room_no}},{{name}}</h1>
+            <div id="messages" style="position: absolute; top: 55px; left: 25%;">
+                {% for x in messages %}
+                <div class="msg">{{x}}</div>
+                <br>
+                {% endfor %}
+            </div>
+            <div style="position: absolute;bottom: 0px;" class="d-flex justify-content-center inputblock">
+                <input id="input1" style="width: 30vw;" class="form-control" type="text" placeholder="Enter Message" name="message">
+                <input style="margin-left: 2px;" id="input2" class="btn btn-primary" type="submit" value="Send">
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+         <script>
+             const chatsoc = new WebSocket('ws://'+window.location.host+'/ws/chat/{{room_no}}/');
+             $('#input2').on('click',function(){
+              var msg=$('#input1').val();
+              chatsoc.send(JSON.stringify({'msg':'{{name}}: '+msg}));
+              $('#input1').val('');
+             });
+             chatsoc.onmessage=function(e){
+               data=JSON.parse(e.data);
+               msg=data['msg'];
+               document.querySelector('#messages').innerHTML+='<div class="msg">'+ msg +'</div><br>';
+             };
+             $('#input1').on('keyup',function(e){
+              if(e.keyCode==13){
+                  $('#input2').click();
+              }
+             });
+         </script>
+    </body>
+</html>
